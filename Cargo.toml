@@ -1,0 +1,23 @@
+[package]
+name = "swim-backend"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+actix-web = { version = "^4", features = ["openssl"]}
+openssl = { version = "0.10", features = ["v110"] }
+actix-web-httpauth = "0.8.1"
+actix-cors = "^0.6"
+rusqlite = {version = "0.30.0", features = ["bundled"]}
+lazy_static = "1.4.0"
+uuid = { version = "1.6.1", features = ["serde", "v4"] }
+serde = {version="1.0.193", features = ["derive"]}
+r2d2 = "0.8.10"
+r2d2_sqlite = "0.23.0"
+bcrypt = "0.15.0"
+chrono = "0.4"
+jsonwebtoken = "9.2.0"
+envfile = "0.2.1"
+env_logger = "0.10.1"

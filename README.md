@@ -1,0 +1,96 @@
+"Before starting, please use `cargo test` to create the relevant tables."
+
+> ```rust
+> #[cfg(test)]
+> mod usertable {
+>     use super::*;
+>     #[test]
+>     fn test_create_user_table() {
+>         create_user_table();
+>     }
+> }
+> ```
+
+**run**
+
+```
+cargo test
+cargo run
+```
+
+### Configure OpenSSL
+
+#### Generating Trusted Certificate
+
+We put self-signed certificate in this directory as an example but your browser will complain that connections to the server aren't secure. We recommend to use [`mkcert`](https://github.com/FiloSottile/mkcert) to trust it. To use a local CA, you should run:
+
+```
+mkcert -install
+```
+
+If you want to generate your own private key/certificate pair, then run:
+
+```
+mkcert -key-file key.pem -cert-file cert.pem 127.0.0.1 localhost
+```
+
+A new `key.pem` and `cert.pem` will be saved to the current directory. You will then need to modify `main.rs` where indicated.
+
+#### install openssl
+
+1. clone [vcpkg](https://github.com/Microsoft/vcpkg)
+
+2. open directory where you've cloned vcpkg
+
+3. run `./bootstrap-vcpkg.bat`
+
+4. run `./vcpkg.exe install openssl-windows:x64-windows`
+
+5. run `./vcpkg.exe install openssl:x64-windows-static`
+
+6. run `./vcpkg.exe integrate install`
+
+7. run `set VCPKGRS_DYNAMIC=1` (or simply set it as your environment variable)
+
+8. Add environment variables`$env:OPENSSL_DIR="<vcpkg>\installed\x64-windows-static"`
+
+9. Ensure that the environment variables already exist in the terminal:powershell run`$env:OPENSSL_DIR`
+
+   ```
+   PS D:\...\actix-web-authDemo> $env:OPENSSL_DIR
+   D:\installed\vcpkg\installed\x64-windows-static
+   ```
+
+   
+
+   修改main.js
+
+   ```rust
+   #[actix_web::main]
+   async fn main() -> std::io::Result<()> {
+       // 配置openssl
+       let mut builder = SslAcceptor::mozilla_intermediate(SslMethod::tls()).unwrap();
+       builder
+           .set_private_key_file("cert/key.pem", SslFiletype::PEM)
+           .unwrap();
+       builder.set_certificate_chain_file("cert/cert.pem").unwrap();
+       env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
+       HttpServer::new(|| {
+           App::new()
+               ...
+               ...
+       })
+       .bind_openssl("127.0.0.1:8080",builder)?
+       // .bind("127.0.0.1:8080")?
+       .workers(1)
+       .run()
+       .await
+   }
+   
+   ```
+
+   ```
+   cargo run
+   ```
+
+   GET https://127.0.0.1:8080/hello/world
