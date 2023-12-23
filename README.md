@@ -36,7 +36,7 @@ mkcert -key-file key.pem -cert-file cert.pem 127.0.0.1 localhost
 
 A new `key.pem` and `cert.pem` will be saved to the current directory. You will then need to modify `main.rs` where indicated.
 
-#### install openssl
+#### install openssl [windows]
 
 1. clone [vcpkg](https://github.com/Microsoft/vcpkg)
 
@@ -60,15 +60,25 @@ A new `key.pem` and `cert.pem` will be saved to the current directory. You will 
    PS D:\...\actix-web-authDemo> $env:OPENSSL_DIR
    D:\installed\vcpkg\installed\x64-windows-static
    ```
+#### install openssl [linux]
+1.Install `pkg-config`: You need to install `pkg-config` on your Linux distribution. Depending on your operating system, the installation command might vary:
+For Ubuntu/Debian: `sudo apt install pkg-config`
+For Fedora: `sudo dnf install pkg-config`
+For CentOS/RedHat: `sudo yum install pkg-config`
+For Alpine Linux: `sudo apk add pkgconfig`
+2. Install OpenSSL Development Package: You also need to make sure that the development package of `OpenSSL` is installed:
+For Ubuntu/Debian: `sudo apt install libssl-dev`
+For Fedora: `sudo dnf install openssl-devel`
+For CentOS/RedHat: `sudo yum install openssl-devel`
+For Alpine Linux: `sudo apk add openssl-dev`
+3. Set Environment Variable (if necessary): If you still encounter issues after installing the above packages, you might need to set the OPENSSL_DIR environment variable to help the openssl-sys crate locate the OpenSSL installation.
 
-   
-
-   修改main.js
+   update main.js
 
    ```rust
    #[actix_web::main]
    async fn main() -> std::io::Result<()> {
-       // 配置openssl
+       // configure openssl
        let mut builder = SslAcceptor::mozilla_intermediate(SslMethod::tls()).unwrap();
        builder
            .set_private_key_file("cert/key.pem", SslFiletype::PEM)
